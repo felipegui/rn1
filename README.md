@@ -1,0 +1,1 @@
+Estudo sobre Swipe usando React Native junto com Expo.
