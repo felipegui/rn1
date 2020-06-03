@@ -1,1 +1,1 @@
-Estudo sobre Swipe usando React Native junto com Expo.
+Estudo sobre AsyncStorage usando a depedência @react-native-community/async-storage

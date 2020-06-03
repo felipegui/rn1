@@ -1,55 +1,75 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components/native';
-import uuid from 'uuid/v4';
-import { SwipeListView } from 'react-native-swipe-list-view';
-
-import Lista from './src/Lista';
-import ListaItem from './src/components/ListaItem';
-import AddItemArea from './src/components/AddItemArea';
-import ListaItemSwipe from './src/components/ListaItemSwipe';
+import AsyncStorage from '@react-native-community/async-storage';
 
 const Page = styled.View`
   flex: 1;
   margin-top: 52px;
+  align-items: center;
 `;
-const Listagem = styled.FlatList`
-  flex: 1;
+const Input = styled.TextInput`
+  font-size: 15px;
+  border: 1px solid #000;
+  height: 50px;
+  width: 90%;
+  padding: 10px;
+`;
+const Button = styled.TouchableOpacity`
+  width: 50%;
+  height: 50px;
+  background-color: #4169E1;
+  margin-top: 10px;
+  align-items: center;
+  justify-content: center;  
+  border-radius: 10px;
+`;
+const Text = styled.Text`
+  font-size: 20px;
+`;
+const NameArea = styled.View`
+  width: 90%;
+  height: 100px;
+  background-color: #87CEFA;
+  margin-top: 30px;
+`;
+const Name = styled.Text`
+  font-size: 18px;
 `;
 
 export default function App() {
-  const [ items, setItems ] = useState(Lista);
+  const [name, setName] = useState('');
+  const [newName, setNewName] = useState('');
 
-  const addNewItem = (txt) => {
-    let newItems = [...items];
-    newItems.push({
-      id: uuid(),
-      task: txt,
-      done: false
-    });
-    setItems(newItems);
+  const handleSave = async () => {
+    if ( newName != '' ) {
+      await AsyncStorage.setItem('@name', newName);
+      setName(newName);
+      setNewName('');
+    }
   }
-  const toogleDone = (index) => {
-    let newItems = [...items];
-    newItems[index].done = !newItems[index].done;
-    setItems(newItems);
+
+  const getName = async () => {
+    const n = await AsyncStorage.getItem('@name');
+    setName(n);
   }
-  const deleteItem = (index) => {
-    let newItems = [...items];
-    newItems = newItems.filter((it, i) => i != index);
-    setItems(newItems);
-  }
+
+  useEffect(() => {
+    getName();
+  }, []);
 
   return (
     <Page>
-      <AddItemArea onAdd={addNewItem}/>
-      <SwipeListView
-        data={items}
-        renderItem={({item, index}) => <ListaItem data={item} onPress={() => toogleDone(index)}/>}
-        renderHiddenItem={({item, index}) => <ListaItemSwipe onDelete={() => deleteItem(index)}/> }
-        leftOpenValue={50}
-        disableLeftSwipe={true}
-        keyExtractor={(item) => item.id}
+      <Input
+        placeholder="Qual seu nome?"
+        value={newName}
+        onChangeText={event => setNewName(event)}
       />
+      <Button onPress={handleSave}>
+        <Text>Salvar</Text>
+      </Button>
+      <NameArea>
+        <Name>{name}</Name>
+      </NameArea>
     </Page>
   );
 }
